@@ -67,7 +67,7 @@ export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center min-h-full bg-[#020C12]">
       <div className="flex flex-col w-1/2">
-        <p className="text-white text-xl mr-5">{score}/{characters.length} {(score/characters.length)*100}%</p>
+        <p className="text-white text-xl mr-7">{score}/{characters.length} {score > 0 && ` (${round((score / characters.length) * 100)}%)`}</p>
         <h1 className="text-3xl tracking-wide leading-11 select-none">
           {characters.map((char, index) => {
             let letterClass = "text-[#1AD5FF] [text-shadow:0_0_8px_rgba(26,213,255,0.6)]";
