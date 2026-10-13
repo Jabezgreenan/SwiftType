@@ -2,20 +2,28 @@ import { useState, useEffect, useMemo } from "react";
 import { passages } from "../data/passages";
 import { MdOutlineRestartAlt } from "react-icons/md";
 import { GrFormNextLink } from "react-icons/gr";
-
-
-
+import Confetti from "../components/Confetti.jsx";
 
 export default function Home() {
   const [passageIndex, setPassageIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userHistory, setUserHistory] = useState([]);
   const [score, setScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const characters = useMemo(() => {
     const currentPassage = passages[passageIndex].passage;
     return currentPassage.split(" ").slice(0, 15).join(" ").split("");
   }, [passageIndex]);
+
+  // SIMPLE CONDITIONAL: Triggers confetti when score perfectly matches total characters
+  useEffect(() => {
+    if (score === characters.length && characters.length > 0) {
+      setShowConfetti(true);
+    } else {
+      setShowConfetti(false);
+    }
+  }, [score, characters.length]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -25,22 +33,19 @@ export default function Home() {
 
       if (key === "Backspace") {
         if (currentIndex > 0) {
-          // Check if the character we are deleting was a correct match
           const lastTargetChar = characters[currentIndex - 1];
           const lastTypedChar = userHistory[currentIndex - 1];
-          
+
           if (lastTargetChar === lastTypedChar) {
-            setScore((prev) => Math.max(0, prev - 1)); // Safely decrement score
+            setScore((prev) => Math.max(0, prev - 1));
           }
-          
+
           setCurrentIndex((prev) => Math.max(0, prev - 1));
           setUserHistory((prev) => prev.slice(0, -1));
         }
       } else if (currentIndex < characters.length) {
-        // Record the key typed
         setUserHistory((prev) => [...prev, key]);
-        
-        // SCORE LOGIC LIVE HERE: Check if the key matches the current letter
+
         if (key === characters[currentIndex]) {
           setScore((prev) => prev + 1);
         }
@@ -51,7 +56,7 @@ export default function Home() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex, characters, userHistory]); // Added missing dependencies
+  }, [currentIndex, characters, userHistory, score]);
 
   const handleRestart = () => {
     setCurrentIndex(0);
@@ -66,18 +71,27 @@ export default function Home() {
 
   return (
     <section className="flex flex-col items-center justify-center min-h-full bg-[#020C12]">
+      {/* Confetti renders automatically when showConfetti is true */}
+      {showConfetti && <Confetti />}
+
       <div className="flex flex-col w-1/2">
-        <p className="text-white text-xl mr-7">{score}/{characters.length} {score > 0 && ` (${Math.round((score / characters.length) * 100)}%)`}</p>
+        <p className="text-white text-xl mr-7">
+          {score}/{characters.length}{" "}
+          {score > 0 && ` (${Math.round((score / characters.length) * 100)}%)`}
+        </p>
         <h1 className="text-3xl tracking-wide leading-11 select-none">
           {characters.map((char, index) => {
-            let letterClass = "text-[#1AD5FF] [text-shadow:0_0_8px_rgba(26,213,255,0.6)]";
+            let letterClass =
+              "text-[#1AD5FF] [text-shadow:0_0_8px_rgba(26,213,255,0.6)]";
 
             if (index < currentIndex) {
               const pressedKey = userHistory[index];
               if (char === pressedKey) {
-                letterClass = "text-[#FFFFFF] [text-shadow:0_0_8px_rgba(255,255,255,0.8)]";
+                letterClass =
+                  "text-[#FFFFFF] [text-shadow:0_0_8px_rgba(255,255,255,0.8)]";
               } else {
-                letterClass = "text-[#FF1A43] [text-shadow:0_0_8px_rgba(255,26,67,0.8)]";
+                letterClass =
+                  "text-[#FF1A43] [text-shadow:0_0_8px_rgba(255,26,67,0.8)]";
               }
             }
 
