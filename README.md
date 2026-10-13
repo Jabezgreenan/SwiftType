@@ -4,7 +4,7 @@ A typing speed test application built with React, Tailwind CSS, and React Router
 
 ## Live Demo
 
-[View Live Site]((https://swifttype-blond.vercel.app/))
+[View Live Site](https://swifttype-blond.vercel.app/)
 
 ## Screenshots
 
